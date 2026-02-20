@@ -79,6 +79,15 @@ readline(char *buf, int max_len)
   buf[i] = '\0';
 }
 
+// Helper function to get the maximum counter number
+// ПЕРЕМЕЩЕНО ВЫШЕ - теперь объявлена до использования
+long
+get_num_counters_available()
+{
+  struct sbiret ret = sbi_call(0, 0, 0, 0, 0, 0, SBI_EXT_CTR_NUM, SBI_EXT_PMU);
+  return (ret.error == SBI_SUCCESS) ? ret.value - 1 : 0;
+}
+
 void
 get_sbi_version()
 {
@@ -87,8 +96,7 @@ get_sbi_version()
   if (ret.error == SBI_SUCCESS) {
     long major = ret.value >> 24;
     long minor = ret.value & 0xFFFFFF;
-    printf("\nSBI Specification Version: %d.%d.%d\n", 
-           major, (minor >> 16) & 0xFF, minor & 0xFFFF);
+    printf("\nSBI Specification Version: %ld.%ld\n", major, minor);
   } else {
     printf("\nFailed to get SBI version. Error: %ld\n", ret.error);
   }
@@ -109,10 +117,18 @@ get_num_counters()
 void
 get_counter_details()
 {
-  printf("\nEnter counter number (0-%ld): ", get_num_counters_available());
+  long max_counters = get_num_counters_available();
+  printf("\nEnter counter number (0-%ld): ", max_counters);
+  
   char input[32];
   readline(input, sizeof(input));
   long counter_num = atoi(input);
+  
+  // Проверка на допустимый диапазон
+  if (counter_num < 0 || counter_num > max_counters) {
+    printf("\n❌ Invalid counter number. Please enter a number between 0 and %ld.\n", max_counters);
+    return;
+  }
 
   struct sbiret ret = sbi_call(counter_num, 0, 0, 0, 0, 0, SBI_EXT_CTR_DTLS, SBI_EXT_PMU);
   
@@ -137,19 +153,15 @@ get_counter_details()
   }
 }
 
-// Helper function to get the maximum counter number
-long
-get_num_counters_available()
-{
-  struct sbiret ret = sbi_call(0, 0, 0, 0, 0, 0, SBI_EXT_CTR_NUM, SBI_EXT_PMU);
-  return (ret.error == SBI_SUCCESS) ? ret.value - 1 : 0;
-}
-
 void
 system_shutdown()
 {
   printf("\nShutting down system...\n");
   printf("\nThank you for using the program!\n");
+  printf("    |\\      _,,,---,,_\n");
+  printf("ZZZzz /,`.-'`'    -.  ;-;;,_\n");
+  printf("   |,4-  ) )-,_. ,\\ (  `'-'\n");
+  printf("  '---''(_/--'  `-'\\_)\n\n");
   
   struct sbiret ret = sbi_call(0, 0, 0, 0, 0, 0, SBI_EXT_SHUTDOWN, SBI_EXT_SRST);
   
