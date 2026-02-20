@@ -157,11 +157,6 @@ void
 system_shutdown()
 {
   printf("\nShutting down system...\n");
-  printf("\nThank you for using the program!\n");
-  printf("    |\\      _,,,---,,_\n");
-  printf("ZZZzz /,`.-'`'    -.  ;-;;,_\n");
-  printf("   |,4-  ) )-,_. ,\\ (  `'-'\n");
-  printf("  '---''(_/--'  `-'\\_)\n\n");
   
   struct sbiret ret = sbi_call(0, 0, 0, 0, 0, 0, SBI_EXT_SHUTDOWN, SBI_EXT_SRST);
   
@@ -181,9 +176,9 @@ display_menu()
   printf("║        OpenSBI Function Menu       ║\n");
   printf("╠════════════════════════════════════╣\n");
   printf("║ 1. Get SBI specification version   ║\n");
-  printf("║ 2. Get number of counters           ║\n");
-  printf("║ 3. Get details of a counter         ║\n");
-  printf("║ 4. System shutdown                  ║\n");
+  printf("║ 2. Get number of counters          ║\n");
+  printf("║ 3. Get details of a counter        ║\n");
+  printf("║ 4. System shutdown                 ║\n");
   printf("╚════════════════════════════════════╝\n");
   printf("Enter option (1-4): ");
 }
